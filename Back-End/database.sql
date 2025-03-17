@@ -19,7 +19,7 @@ CREATE TABLE sensors (
 
 CREATE TABLE notifications (
     notification_id SERIAL PRIMARY KEY,
-    timestamp TIMESTAMPTZ,
+    timestamp TIMESTAMPTZ NOT NULL,
     text TEXT NOT NULL,
     type INTEGER NOT NULL CHECK (type IN (1, 2))
 );

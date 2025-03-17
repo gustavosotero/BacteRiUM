@@ -30,12 +30,12 @@ class UserCreate(BaseModel):
     email: str
     role: int
 
-class SensorCreate(BaseModel):
+class SensorCreate(BaseModel): 
     timestamp: datetime
     temperature: float
     humidity: float
     light_intensity: float
-    image_url: str
+    image_url: str | None = None
 
 class NotificationCreate(BaseModel):
     timestamp: datetime
@@ -119,16 +119,6 @@ async def get_sensor_data(start_date: datetime, end_date: datetime, db: AsyncSes
                 "humidity": row.humidity, 
                 "light_intensity": row.light_intensity, 
                 "image_url": row.image_url} for row in sensor_data]
-    return sensors
-
-    
-    # Convert the data into a list of Pydantic models or dictionaries
-    sensors = [{"timestamp": row.timestamp, 
-                "temperature": row.temperature, 
-                "humidity": row.humidity, 
-                "light_intensity": row.light_intensity, 
-                "image_url": row.image_url} for row in sensor_data]
-
     return sensors
 
 @app.post("/notifications/")
