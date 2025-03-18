@@ -11,9 +11,9 @@ CREATE TABLE users (
 
 CREATE TABLE sensors (
     timestamp TIMESTAMPTZ PRIMARY KEY,
-    temperature FLOAT,
-    humidity FLOAT,
-    light_intensity FLOAT,
+    temperature DOUBLE PRECISION,
+    humidity DOUBLE PRECISION,
+    light_intensity DOUBLE PRECISION,
     image_url TEXT
 );
 

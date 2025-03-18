@@ -2,7 +2,8 @@ from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Enum, String, Float, Integer, DateTime, text
-from pydantic import BaseModel, HttpUrl
+from sqlalchemy.future import select
+from pydantic import BaseModel
 from datetime import datetime
 import os
 import logging
@@ -108,11 +109,17 @@ async def create_sensor_data(sensor: SensorCreate, db: AsyncSession = Depends(ge
     return {"message": "Sensor data added"}
 
 @app.get("/sensors/")
-async def get_sensor_data(start_date: datetime, end_date: datetime, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
-        text("SELECT * FROM sensors WHERE timestamp BETWEEN :start AND :end"), 
-        {"start": start_date, "end": end_date}
-    )
+async def get_sensor_data(start_date: datetime = None, end_date: datetime = None, db: AsyncSession = Depends(get_db)):
+    if start_date is None or end_date is None:
+        result = await db.execute(
+            text("SELECT * FROM sensors")
+        )
+        sensor_data = result.fetchall()
+    else:
+        result = await db.execute(
+            text("SELECT * FROM sensors WHERE timestamp BETWEEN :start AND :end"),
+            {"start": start_date, "end": end_date}
+        )
     sensor_data = result.fetchall()
     sensors = [{"timestamp": row.timestamp, 
                 "temperature": row.temperature, 
