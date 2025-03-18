@@ -6,14 +6,14 @@ CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
-    role INT CHECK (role IN (1, 2))
+    role INT CHECK (role IN (1, 2)) NOT NULL
 );
 
 CREATE TABLE sensors (
     timestamp TIMESTAMPTZ PRIMARY KEY,
-    temperature FLOAT NOT NULL,
-    humidity FLOAT NOT NULL,
-    light_intensity FLOAT NOT NULL,
+    temperature FLOAT,
+    humidity FLOAT,
+    light_intensity FLOAT,
     image_url TEXT
 );
 
@@ -31,5 +31,5 @@ SELECT create_hypertable('sensors', 'timestamp');
 docker exec -it cyanobox psql -U postgres --Command to activate the database
 
 --info & shortcuts:
---
+--uvicorn main:app --host 0.0.0.0 --port 8000 --reload (running main.py)
 --
