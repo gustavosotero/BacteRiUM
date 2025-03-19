@@ -113,8 +113,9 @@ async def create_sensor_data(sensor: SensorPy, db: AsyncSession = Depends(get_db
 @app.get("/sensors/")
 async def get_sensor_data(start_date: datetime, end_date: datetime, db: AsyncSession = Depends(get_db)):
     logger.info(f"Querying sensor data from {start_date} to {end_date}")
+    start_date = start_date - timedelta(days=1)
     result = await db.execute(
-        text("SELECT * FROM sensors WHERE timestamp BETWEEN :start AND :end"),
+        text("SELECT * FROM sensors WHERE timestamp >= :start AND timestamp <= :end ORDER BY timestamp ASC"),
         {"start": start_date, "end": end_date}
     )
     sensor_data = result.fetchall()
@@ -139,7 +140,7 @@ async def create_notification(notification: NotificationPy, db: AsyncSession = D
 #Get all notifications
 @app.get("/notifications/")
 async def get_notifications(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(text("SELECT * FROM notifications"))
+    result = await db.execute(text("SELECT * FROM notifications ORDER BY timestamp ASC"))
     notifications = result.fetchall()
     return [{"id": notification[0], "timestamp": notification[1], "text": notification[2], "type": notification[3]} for notification in notifications]
 
@@ -150,5 +151,4 @@ if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
 #dates
-#2025-03-16T00:00:00
-#2025-03-19T00:00:00
+#2025-03-18T00:00:00
