@@ -28,8 +28,11 @@ CREATE EXTENSION IF NOT EXISTS timescaledb;
 
 SELECT create_hypertable('sensors', 'timestamp');
 
-docker exec -it cyanobox psql -U postgres --Command to activate the database
-
 --info & shortcuts:
---uvicorn main:app --host 0.0.0.0 --port 8000 --reload (running main.py)
---
+--uvicorn main:app --reload (running app)
+--docker exec -it cyanobox psql -U postgres (activate the database)
+--DB USER = postgres
+--DB PASS.= postgres
+--DB NAME = cyanobox
+--\c cyanobox (connect to DB)
+
