@@ -62,7 +62,7 @@ const Sidebar = () => {
         >
             <ProSidebar collapsed={isCollapsed}>
                 <Menu iconShape="square">
-                    {/* LOGO AND MENU ICON */}
+                    {/*MENU ICON*/}
                     <MenuItem
                         onClick={() => setIsCollapsed(!isCollapsed)}
                         icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
@@ -100,7 +100,6 @@ const Sidebar = () => {
                         <Typography
                         variant="h6"
                         color={colors.grey[300]}
-                        //sx={{ m: "15px 0 5px 5px" }}
                         sx={isCollapsed ? { m: "15px 0 5px 5px" } : { m: "15px 0 5px 20px" }}
                         >
                         Data
@@ -123,7 +122,6 @@ const Sidebar = () => {
                         <Typography
                         variant="h6"
                         color={colors.grey[300]}
-                        //sx={{ m: "15px 0 5px 5px" }}
                         sx={isCollapsed ? { m: "15px 0 5px 5px" } : { m: "15px 0 5px 20px" }}
                         >
                         Account Managging
@@ -153,7 +151,6 @@ const Sidebar = () => {
                         <Typography
                         variant="h6"
                         color={colors.grey[300]}
-                        //sx={{ m: "15px 0 5px 5px" }}
                         sx={isCollapsed ? { m: "15px 0 5px 5px" } : { m: "15px 0 5px 20px" }}
                         >
                         Others
