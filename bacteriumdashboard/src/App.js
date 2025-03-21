@@ -5,7 +5,7 @@ import { ColorModeContext, useMode } from "./theme";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard/Dashboard";
-// import FAQ from "./scenes/faq's/faq";
+import FAQ from "./scenes/faq's/faq";
 // import ContactInfo from "./scenes/contactInformation/contactinfo";
 // import AlertNotification from "./scenes/alertNotification/AlertNotification";
 // import Charts from "./scenes/charts/charts";
@@ -36,7 +36,7 @@ function App() {
               {/* <Route path="/profileForm" element={<ProfileForm/>}/> */}
               {/* <Route path="/contactInformation" element={<ContactInfo/>}/> */}
               {/* <Route path="/alertNotification" element={<AlertNotification/>}/> */}
-              {/* <Route path="/faq's" element={<FAQ/>}/> */}
+              <Route path="/faq's" element={<FAQ/>}/>
             </Routes>
           </main>
         </div>
