@@ -100,7 +100,8 @@ const Sidebar = () => {
                         <Typography
                         variant="h6"
                         color={colors.grey[300]}
-                        sx={{ m: "15px 0 5px 5px" }}
+                        //sx={{ m: "15px 0 5px 5px" }}
+                        sx={isCollapsed ? { m: "15px 0 5px 5px" } : { m: "15px 0 5px 20px" }}
                         >
                         Data
                         </Typography>
@@ -122,7 +123,8 @@ const Sidebar = () => {
                         <Typography
                         variant="h6"
                         color={colors.grey[300]}
-                        sx={{ m: "15px 0 5px 5px" }}
+                        //sx={{ m: "15px 0 5px 5px" }}
+                        sx={isCollapsed ? { m: "15px 0 5px 5px" } : { m: "15px 0 5px 20px" }}
                         >
                         Account Managging
                         </Typography>
@@ -151,7 +153,8 @@ const Sidebar = () => {
                         <Typography
                         variant="h6"
                         color={colors.grey[300]}
-                        sx={{ m: "15px 0 5px 5px" }}
+                        //sx={{ m: "15px 0 5px 5px" }}
+                        sx={isCollapsed ? { m: "15px 0 5px 5px" } : { m: "15px 0 5px 20px" }}
                         >
                         Others
                         </Typography>
