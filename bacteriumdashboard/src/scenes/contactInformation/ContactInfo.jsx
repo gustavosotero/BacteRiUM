@@ -4,8 +4,8 @@ import Headers from '../../Components/Headers';
 
 const ContactInfo = () => {
   return (
-    <Box sx={{ p: 4 }}>
-      <Headers title={"Contact Information"} />
+    <Box margin = "20px">
+    <Headers title={"Contact Information"} />
       <Grid container spacing={3}>
         {/* Email */}
         <Grid item xs={12} md={6} lg={4}>

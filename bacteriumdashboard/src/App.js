@@ -11,7 +11,7 @@ import ContactInfo from "./scenes/contactInformation/ContactInfo";
 // import Charts from "./scenes/charts/charts";
 // import PicturesPage from "./scenes/picturesPage/PicturesPage";
 // import ManageTeam from "./scenes/manageTeam/ManageTeam";
-// import ProfileForm from "./scenes/profileForm/ProfileForm";
+import ProfileForm from "./scenes/profileForm/ProfileForm";
 
 
 
@@ -33,7 +33,7 @@ function App() {
               {/* <Route path="/charts" element={<Charts/>}/> */}
               {/* <Route path="/picturesPage" element={<PicturesPage/>}/> */}
               {/* <Route path="/manageTeam" element={<ManageTeam/>}/> */}
-              {/* <Route path="/profileForm" element={<ProfileForm/>}/> */}
+              <Route path="/profileForm" element={<ProfileForm/>}/>
               <Route path="/contactInformation" element={<ContactInfo/>}/>
               {/* <Route path="/alertNotification" element={<AlertNotification/>}/> */}
               <Route path="/faq's" element={<FAQ/>}/>
