@@ -6,7 +6,7 @@ import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard/Dashboard";
 import FAQ from "./scenes/faq's/faq";
-// import ContactInfo from "./scenes/contactInformation/contactinfo";
+import ContactInfo from "./scenes/contactInformation/ContactInfo";
 // import AlertNotification from "./scenes/alertNotification/AlertNotification";
 // import Charts from "./scenes/charts/charts";
 // import PicturesPage from "./scenes/picturesPage/PicturesPage";
@@ -34,7 +34,7 @@ function App() {
               {/* <Route path="/picturesPage" element={<PicturesPage/>}/> */}
               {/* <Route path="/manageTeam" element={<ManageTeam/>}/> */}
               {/* <Route path="/profileForm" element={<ProfileForm/>}/> */}
-              {/* <Route path="/contactInformation" element={<ContactInfo/>}/> */}
+              <Route path="/contactInformation" element={<ContactInfo/>}/>
               {/* <Route path="/alertNotification" element={<AlertNotification/>}/> */}
               <Route path="/faq's" element={<FAQ/>}/>
             </Routes>
