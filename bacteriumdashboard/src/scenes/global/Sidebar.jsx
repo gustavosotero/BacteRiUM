@@ -78,9 +78,13 @@ const Sidebar = () => {
                             alignItems="center"
                             ml="15px"
                         >
-                            <Typography variant="h3" color={colors.grey[100]}>
+                            <img 
+                                src="BacteRiUM logo.png" 
+                                style={{ height: "90px", marginRight: "20px" }} 
+                            />
+                            {/* <Typography variant="h3" color={colors.grey[100]}>
                             BacteRiUM
-                            </Typography>
+                            </Typography> */}
                             <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                             <MenuOutlinedIcon />
                             </IconButton>
