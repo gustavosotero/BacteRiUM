@@ -40,3 +40,18 @@ export const mockPhotos = [
     url: "",
   },
 ];
+
+export const mockNotifications = [
+  {
+    id: "1",
+    timestamp: "3/25/2025",
+    text: "The temperature value exceeded the threshold",
+    type: "1", 
+  },
+  {
+    id: "2",
+    timestamp: "4/28/2025",
+    text: "The humidity value exceeded the threshold",
+    type: "1", 
+  }
+];

@@ -7,7 +7,7 @@ import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard/Dashboard";
 import FAQ from "./scenes/faq's/faq";
 import ContactInfo from "./scenes/contactInformation/ContactInfo";
-// import AlertNotification from "./scenes/alertNotification/AlertNotification";
+import AlertNotification from "./scenes/alertNotification/AlertNotification";
 // import Charts from "./scenes/charts/charts";
 // import PicturesPage from "./scenes/picturesPage/PicturesPage";
 import ManageTeam from "./scenes/manageTeam/ManageTeam";
@@ -35,7 +35,7 @@ function App() {
               <Route path="/manageTeam" element={<ManageTeam/>}/>
               <Route path="/profileForm" element={<ProfileForm/>}/>
               <Route path="/contactInformation" element={<ContactInfo/>}/>
-              {/* <Route path="/alertNotification" element={<AlertNotification/>}/> */}
+              <Route path="/alertNotification" element={<AlertNotification/>}/>
               <Route path="/faq's" element={<FAQ/>}/>
             </Routes>
           </main>
