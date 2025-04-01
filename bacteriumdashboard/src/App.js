@@ -8,8 +8,8 @@ import Dashboard from "./scenes/dashboard/Dashboard";
 import FAQ from "./scenes/faq's/faq";
 import ContactInfo from "./scenes/contactInformation/ContactInfo";
 import AlertNotification from "./scenes/alertNotification/AlertNotification";
-// import Charts from "./scenes/charts/charts";
-// import PicturesPage from "./scenes/picturesPage/PicturesPage";
+import Charts from "./scenes/charts/Charts";
+import PicturesPage from "./scenes/picturesPage/PicturesPage";
 import ManageTeam from "./scenes/manageTeam/ManageTeam";
 import ProfileForm from "./scenes/profileForm/ProfileForm";
 
@@ -30,8 +30,8 @@ function App() {
             <Topbar/>
             <Routes>
               <Route path="/" element={<Dashboard/>}/>
-              {/* <Route path="/charts" element={<Charts/>}/> */}
-              {/* <Route path="/picturesPage" element={<PicturesPage/>}/> */}
+              <Route path="/charts" element={<Charts/>}/>
+              <Route path="/picturesPage" element={<PicturesPage/>}/>
               <Route path="/manageTeam" element={<ManageTeam/>}/>
               <Route path="/profileForm" element={<ProfileForm/>}/>
               <Route path="/contactInformation" element={<ContactInfo/>}/>
