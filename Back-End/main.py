@@ -53,7 +53,7 @@ class User(Base):
 
 class SensorReading(Base):
     __tablename__ = "sensors"
-    timestamp = Column(DateTime, primary_key=True)
+    timestamp = Column(DateTime(timezone=True), primary_key=True)
     temperature = Column(Float, nullable=False)
     humidity = Column(Float, nullable=False)
     light_intensity = Column(Float, nullable=False)
@@ -152,3 +152,24 @@ if __name__ == "__main__":
 
 #dates
 #2025-03-18T00:00:00
+
+#{
+#  "user_id": 1,
+#  "name": "John Doe",
+#  "email": "johndoe@example.com",
+#  "role": 2
+#}
+
+#{
+#  "timestamp": "2025-03-19T12:00:00Z",
+#  "temperature": 26.5,
+#  "humidity": 65.2,
+#  "light_intensity": 300,
+#  "image_url": "https://example.com/images/sample.jpg"
+#}
+
+#{
+#  "timestamp": "2025-03-19T12:05:00Z",
+#  "text": "Temperature dropped below 25°C",
+#  "type": 1
+#}
