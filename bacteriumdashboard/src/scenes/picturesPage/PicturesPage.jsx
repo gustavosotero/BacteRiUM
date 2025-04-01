@@ -68,7 +68,7 @@ const PicturesPage = () => {
       {/* Top Control Row */}
       <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2} mb={4}>
         {/* Download Button */}
-        <Box>
+        <Box sx={{mt:0.1}}>
           <MUIButton
             variant="contained"
             onClick={handleDownloadClick}

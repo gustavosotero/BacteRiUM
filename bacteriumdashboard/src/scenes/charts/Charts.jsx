@@ -169,7 +169,7 @@ const Charts = () => {
       <Headers title="Historical Charts" />
 
       {/* Top Bar */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4} flexWrap="wrap" gap={2}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4} flexWrap="wrap" gap={2} marginTop={"-20px"}>
         {/* Download Buttons */}
         <Box>
           <MUIButton
@@ -230,7 +230,7 @@ const Charts = () => {
       </Box>
 
       {/* Charts */}
-      <Grid container spacing={2} justifyContent="center" sx={{ml: -17}}>
+      <Grid container spacing={2} justifyContent="center" sx={{ml: -27, mt:-7.4}}>
         <Grid item xs={12} sm={6} md={4.5}>
           <Box minHeight="300px" bgcolor="#fff" p={2} borderRadius={2} boxShadow={2}>
             <Typography variant="h6" mb={2}>Temperature</Typography>
