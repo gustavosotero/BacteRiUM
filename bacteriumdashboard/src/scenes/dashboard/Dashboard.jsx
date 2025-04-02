@@ -92,12 +92,12 @@ const Dashboard = () => {
     return (
       <Box margin={"20px"}>
         <Headers title={"Dashboard"} />
-  
+
         {/* Top Cards */}
-        <Grid container spacing={1} justifyContent={"center"}>
+        <Grid container spacing={3} justifyContent={"center"} alignItems={"center"}>
           {/* Temperature Data */}
           <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ height: "100px", width: "300px"}}>
+            <Card sx={{ height: "100px", width: "250px", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff"}}>
                 <CardContent sx={{      
                     justifyContent: "center",
                     alignItems: "center",
@@ -111,7 +111,7 @@ const Dashboard = () => {
   
           {/* Humidity Data */}
           <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ height: "100px", width: "300px"}}>
+            <Card sx={{ height: "100px", width: "250px", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff"}}>
                 <CardContent sx={{      
                     justifyContent: "center",
                     alignItems: "center",
@@ -125,7 +125,7 @@ const Dashboard = () => {
   
           {/* Light Intensity Data */}
           <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ height: "100px", width: "300px"}}>
+            <Card sx={{ height: "100px", width: "250px", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff"}}>
                 <CardContent sx={{      
                     justifyContent: "center",
                     alignItems: "center",
@@ -139,7 +139,7 @@ const Dashboard = () => {
   
           {/* Light Intensity User Input */}
           <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ height: "100px", width: "300px"}}>
+            <Card sx={{ height: "100px", width: "250px", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff"}}>
               <CardContent sx={{      
                 justifyContent: "center",
                 alignItems: "center",
@@ -152,7 +152,7 @@ const Dashboard = () => {
                   onChange={(e) => setNewLightValue(e.target.value)}
                   placeholder="Enter new value"
                   style={{
-                    width: "50%",
+                    width: "53%",
                     padding: "10px",
                     marginTop: "10px",
                     borderRadius: "5px",
@@ -178,7 +178,7 @@ const Dashboard = () => {
         </Grid>
   
         {/* Charts Section */}
-        <Grid container spacing={3} marginTop={2} justifyContent="center">
+        <Grid container spacing={3} marginTop={-1} justifyContent="center">
           <Grid item xs={12} sm={6} md={4}>
             <Box minHeight="300px" bgcolor="#fff" p={2} borderRadius={2} boxShadow={2}>
             <Typography variant="h5" color="#000000" mb={2}>
@@ -206,7 +206,7 @@ const Dashboard = () => {
         </Grid>
                   
         {/* Last Captured Picture */}
-        <Box mt={5}>
+        <Box mt={2}>
           <Typography variant="h3">
             Last Captured Picture
           </Typography>

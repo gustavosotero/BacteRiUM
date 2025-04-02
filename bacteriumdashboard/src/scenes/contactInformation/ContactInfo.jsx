@@ -1,15 +1,16 @@
 import React from 'react';
-import { Grid, Card, CardContent, Typography, Box } from '@mui/material';
+import { Grid, Card, CardContent, Typography, Box, useTheme } from '@mui/material';
 import Headers from '../../Components/Headers';
 
 const ContactInfo = () => {
+  const theme = useTheme();
   return (
     <Box margin = "20px">
     <Headers title={"Contact Information"} />
       <Grid container spacing={3}>
         {/* Email */}
         <Grid item xs={12} md={6} lg={4}>
-          <Card elevation={3}>
+          <Card elevation={3} sx={{backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff"}}>
             <CardContent>
               <Typography variant="h4" gutterBottom>Email</Typography>
               <Typography variant="h5">1@yahoo.com</Typography>
@@ -20,7 +21,7 @@ const ContactInfo = () => {
 
         {/* Phone Numbers */}
         <Grid item xs={12} md={6} lg={4}>
-          <Card elevation={3}>
+          <Card elevation={3} sx={{backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff"}}>
             <CardContent>
               <Typography variant="h4" gutterBottom>Phone Numbers</Typography>
               <Typography variant="h5">...</Typography>
@@ -31,7 +32,7 @@ const ContactInfo = () => {
 
         {/* Location */}
         <Grid item xs={12} md={6} lg={4}>
-          <Card elevation={3}>
+          <Card elevation={3} sx={{backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff"}}>
             <CardContent>
               <Typography variant="h4" gutterBottom>Location</Typography>
               <Typography variant="h5">Lab...</Typography>
@@ -43,7 +44,7 @@ const ContactInfo = () => {
 
         {/* Social Media URLs */}
         <Grid item xs={12} md={6} lg={6}>
-          <Card elevation={3}>
+          <Card elevation={3} sx={{backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff"}}>
             <CardContent>
               <Typography variant="h4" gutterBottom>Social Media</Typography>
               <Typography variant="h5">
@@ -67,7 +68,7 @@ const ContactInfo = () => {
 
         {/* Working Hours */}
         <Grid item xs={12} md={6} lg={6}>
-          <Card elevation={3}>
+          <Card elevation={3} sx={{backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff"}}>
             <CardContent>
               <Typography variant="h4" gutterBottom>Working Hours</Typography>
               <Typography variant="h5">Monday - Friday: ... AM – ... PM</Typography>
