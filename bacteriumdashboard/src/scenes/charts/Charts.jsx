@@ -233,19 +233,19 @@ const Charts = () => {
       <Grid container spacing={2} justifyContent="center" sx={{ml: -27, mt:-7.4}}>
         <Grid item xs={12} sm={6} md={4.5}>
           <Box minHeight="300px" bgcolor="#fff" p={2} borderRadius={2} boxShadow={2}>
-            <Typography variant="h6" mb={2}>Temperature</Typography>
+            <Typography color="#000000"  variant="h5" mb={2}>Temperature</Typography>
             <Line data={chartDataTemplate("Temperature (°C)", "temperature", "blue")} options={chartOptions} />
           </Box>
         </Grid>
         <Grid item xs={12} sm={6} md={4.5}>
           <Box minHeight="300px" bgcolor="#fff" p={2} borderRadius={2} boxShadow={2}>
-            <Typography variant="h6" mb={2}>Humidity</Typography>
+            <Typography color="#000000"  variant="h5" mb={2}>Humidity</Typography>
             <Line data={chartDataTemplate("Humidity (%)", "humidity", "green")} options={chartOptions} />
           </Box>
         </Grid>
         <Grid item xs={12} sm={6} md={4.5}>
           <Box minHeight="300px" bgcolor="#fff" p={2} borderRadius={2} boxShadow={2}>
-            <Typography variant="h6" mb={2}>Light Intensity</Typography>
+            <Typography color="#000000"  variant="h5" mb={2}>Light Intensity</Typography>
             <Line data={chartDataTemplate("Light Intensity (ppfd)", "light", "orange")} options={chartOptions} />
           </Box>
         </Grid>

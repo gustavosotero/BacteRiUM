@@ -24,6 +24,14 @@ const AlertNotification = () => {
       field: "type",
       headerName: "Type",
       flex: 1,
+      renderCell: ({ value }) => {
+        if(value===1)
+          return "Warning"
+        else if(value===2)
+          return "Info" 
+        else 
+          return "Unkown"
+      },
     }
   ];
 
