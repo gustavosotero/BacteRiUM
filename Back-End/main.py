@@ -140,13 +140,19 @@ async def create_sensor_data(sensor: SensorPy, db: AsyncSession = Depends(get_db
 async def set_light_intensity(light_intensity: LightIntensityPy, db: AsyncSession = Depends(get_db)):
     try:
         async with db.begin():
-            await db.execute(delete(LightIntensity))
-            new_light_intensity = LightIntensity(value=light_intensity.value)
-            db.add(new_light_intensity)
-        return {"message": "Light intensity updated successfully"}
+            result = await db.execute(select(LightIntensity.value).order_by(LightIntensity.id.desc()).limit(1))
+            latest_light_intensity = result.scalar_one_or_none()
     except Exception as e:
         return {"error": str(e)}
 
+#Get Light Intensity Value (single value in table)
+@app.get("/light_intensity/")
+async def get_light_intensity(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(LightIntensity.value).limit(1))
+    latest_light_intensity = result.scalar_one_or_none()
+    if latest_light_intensity is None:
+        return {"light_intensity": 0}
+    return {"light_intensity": latest_light_intensity}
 
 ##Get sensor readings (from date range)
 @app.get("/sensors/")
