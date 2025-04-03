@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 #Database setup
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost/cyanobox")
+DATABASE_URL = "postgresql://cyanobox_admin:AYmc1LRD9PPGcH8KbGhE@cyanobox-db.cu3weo4yye22.us-east-1.rds.amazonaws.com/cyanobox"
 engine = create_async_engine(DATABASE_URL, echo=True)
 SessionLocal = async_sessionmaker(bind=engine, expire_on_commit=False)
 Base = declarative_base()
@@ -127,6 +127,61 @@ async def get_sensor_data(start_date: datetime, end_date: datetime, db: AsyncSes
     
     return sensors
 
+##Get temperature readings by date range
+@app.get("/sensors/temperature")
+async def get_temperature_data(start_date: datetime, end_date: datetime, db: AsyncSession = Depends(get_db)):
+    logger.info(f"Querying temperature data from {start_date} to {end_date}")
+    start_date = start_date - timedelta(days=1)
+    result = await db.execute(
+        text("SELECT timestamp, temperature FROM sensors WHERE timestamp >= :start AND timestamp <= :end ORDER BY timestamp ASC"),
+        {"start": start_date, "end": end_date}
+    )
+    sensor_data = result.fetchall()
+    temperatures = [{"timestamp": row.timestamp, "temperature": row.temperature} for row in sensor_data]
+    
+    return temperatures
+
+##Get humidity readings by date range
+@app.get("/sensors/humidity")
+async def get_humidity_data(start_date: datetime, end_date: datetime, db: AsyncSession = Depends(get_db)):
+    logger.info(f"Querying humidity data from {start_date} to {end_date}")
+    start_date = start_date - timedelta(days=1)
+    result = await db.execute(
+        text("SELECT timestamp, humidity FROM sensors WHERE timestamp >= :start AND timestamp <= :end ORDER BY timestamp ASC"),
+        {"start": start_date, "end": end_date}
+    )
+    sensor_data = result.fetchall()
+    humidity_data = [{"timestamp": row.timestamp, "humidity": row.humidity} for row in sensor_data]
+    
+    return humidity_data
+
+##Get light intensity readings by date range
+@app.get("/sensors/light_intensity")
+async def get_light_intensity_data(start_date: datetime, end_date: datetime, db: AsyncSession = Depends(get_db)):
+    logger.info(f"Querying light intensity data from {start_date} to {end_date}")
+    start_date = start_date - timedelta(days=1)
+    result = await db.execute(
+        text("SELECT timestamp, light_intensity FROM sensors WHERE timestamp >= :start AND timestamp <= :end ORDER BY timestamp ASC"),
+        {"start": start_date, "end": end_date}
+    )
+    sensor_data = result.fetchall()
+    light_intensity_data = [{"timestamp": row.timestamp, "light_intensity": row.light_intensity} for row in sensor_data]
+    
+    return light_intensity_data
+
+##Get image URL by date range
+@app.get("/sensors/image_url")
+async def get_image_url_data(start_date: datetime, end_date: datetime, db: AsyncSession = Depends(get_db)):
+    logger.info(f"Querying image URL data from {start_date} to {end_date}")
+    start_date = start_date - timedelta(days=1)
+    result = await db.execute(
+        text("SELECT timestamp, image_url FROM sensors WHERE timestamp >= :start AND timestamp <= :end ORDER BY timestamp ASC"),
+        {"start": start_date, "end": end_date}
+    )
+    sensor_data = result.fetchall()
+    image_urls = [{"timestamp": row.timestamp, "image_url": row.image_url} for row in sensor_data]
+    
+    return image_urls
 
 ##Create notification
 @app.post("/notifications/")
