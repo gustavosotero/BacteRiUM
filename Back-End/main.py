@@ -119,20 +119,23 @@ async def delete_user(email: str, db: AsyncSession = Depends(get_db)):
 ##Create sensor reading
 @app.post("/sensors/")
 async def create_sensor_data(sensor: SensorPy, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(LightIntensity.value))
-    latest_light_intensity = result.scalar_one_or_none()
-    new_sensor_data = SensorReading(
-        timestamp=sensor.timestamp,
-        temperature=sensor.temperature,
-        humidity=sensor.humidity,
-        light_intensity=latest_light_intensity if latest_light_intensity is not None else 0.0,
-        image_url=sensor.image_url
-    )
-    async with db.begin():
-        db.add(new_sensor_data)
-    await db.commit()
-    return {"message": "Sensor data added", "light_intensity": new_sensor_data.light_intensity}
-
+    try:
+        result = await db.execute(text("SELECT * FROM light_intensity"))
+        latest_light_intensity = result.scalar_one_or_none()
+        new_sensor_data = SensorReading(
+            timestamp=sensor.timestamp,
+            temperature=sensor.temperature,
+            humidity=sensor.humidity,
+            light_intensity=latest_light_intensity if latest_light_intensity is not None else 0.0,
+            image_url=sensor.image_url
+        )
+        async with db.begin():
+            db.add(new_sensor_data)
+        await db.commit()
+        return {"message": "Sensor data added", "light_intensity": new_sensor_data.light_intensity}
+    except Exception as e:
+        return {"error": str(e)}
+    
 @app.post("/light_intensity/")
 async def set_light_intensity(light_intensity: LightIntensityPy, db: AsyncSession = Depends(get_db)):
     try:
