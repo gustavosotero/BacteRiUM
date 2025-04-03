@@ -3,9 +3,8 @@ CREATE DATABASE cyanobox;
 \c cyanobox
 
 CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
+    email TEXT PRIMARY KEY, 
     name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
     role INT CHECK (role IN (1, 2)) NOT NULL
 );
 
