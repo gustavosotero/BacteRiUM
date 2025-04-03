@@ -1,8 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column, String, Float, Integer, DateTime, text
-from sqlalchemy.future import select
+from sqlalchemy import Column, String, Float, Integer, DateTime, text, select, delete
 from pydantic import BaseModel
 from datetime import datetime
 from datetime import datetime, timedelta
@@ -46,13 +45,15 @@ class SensorPy(BaseModel):
     timestamp: datetime
     temperature: float
     humidity: float
-    light_intensity: float
     image_url: str | None = None
 
 class NotificationPy(BaseModel):
     timestamp: datetime
     text: str
     type: int
+
+class LightIntensityPy(BaseModel):
+    value: float
 
 #Database models
 class User(Base):
@@ -75,6 +76,11 @@ class Notification(Base):
     timestamp = Column(DateTime, nullable=False)
     text = Column(String, nullable=False)
     type = Column(Integer, nullable=False)
+
+class LightIntensity(Base):
+    __tablename__ = "light_intensity"
+    id = Column(Integer, primary_key=True, index=True)
+    value = Column(Float, nullable=False)
 
 #Routes
 
@@ -102,22 +108,51 @@ async def get_users(db: AsyncSession = Depends(get_db)):
 ##Delete user w/ matching email
 @app.delete("/users/{email}")
 async def delete_user(email: str, db: AsyncSession = Depends(get_db)):
-    user = await db.get(User, email)
+    result = await db.execute(select(User).where(User.email == email))
+    user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    async with db.begin():
-        await db.delete(user)
+    await db.execute(delete(User).where(User.email == email))
     await db.commit()
     return {"message": "User deleted"}
 
 ##Create sensor reading
 @app.post("/sensors/")
 async def create_sensor_data(sensor: SensorPy, db: AsyncSession = Depends(get_db)):
-    new_sensor_data = SensorReading(**sensor.dict())
-    async with db.begin():
-        db.add(new_sensor_data)
-    await db.commit()
-    return {"message": "Sensor data added"}
+    try:
+        async with db.begin():
+            result = await db.execute(select(LightIntensity.value).order_by(LightIntensity.id.desc()).limit(1))
+            latest_light_intensity = result.scalar_one_or_none()
+            new_sensor_data = SensorReading(
+                timestamp=sensor.timestamp,
+                temperature=sensor.temperature,
+                humidity=sensor.humidity,
+                light_intensity=latest_light_intensity if latest_light_intensity is not None else 0.0,
+                image_url=sensor.image_url
+            )
+            db.add(new_sensor_data)
+            await db.commit()
+        return {"message": "Sensor data added", "light_intensity": new_sensor_data.light_intensity}
+    except Exception as e:
+        return {"error": str(e)}
+    
+@app.post("/light_intensity/")
+async def set_light_intensity(light_intensity: LightIntensityPy, db: AsyncSession = Depends(get_db)):
+    try:
+        async with db.begin():
+            result = await db.execute(select(LightIntensity.value).order_by(LightIntensity.id.desc()).limit(1))
+            latest_light_intensity = result.scalar_one_or_none()
+    except Exception as e:
+        return {"error": str(e)}
+
+#Get Light Intensity Value (single value in table)
+@app.get("/light_intensity/")
+async def get_light_intensity(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(LightIntensity.value).limit(1))
+    latest_light_intensity = result.scalar_one_or_none()
+    if latest_light_intensity is None:
+        return {"light_intensity": 0}
+    return {"light_intensity": latest_light_intensity}
 
 ##Get sensor readings (from date range)
 @app.get("/sensors/")
