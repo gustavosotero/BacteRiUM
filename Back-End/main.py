@@ -102,11 +102,11 @@ async def get_users(db: AsyncSession = Depends(get_db)):
 ##Delete user w/ matching email
 @app.delete("/users/{email}")
 async def delete_user(email: str, db: AsyncSession = Depends(get_db)):
-    user = await db.get(User, email)
+    result = await db.execute(select(User).where(User.email == email))
+    user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    async with db.begin():
-        await db.delete(user)
+    await db.execute(select(User).where(User.email == email))
     await db.commit()
     return {"message": "User deleted"}
 
