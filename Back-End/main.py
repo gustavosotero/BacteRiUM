@@ -139,9 +139,9 @@ async def set_light_intensity(light_intensity: LightIntensityPy, db: AsyncSessio
     try:
         await db.execute(delete(LightIntensity))
         new_light_intensity = LightIntensity(value=light_intensity.value)
-        db.add(new_light_intensity)
         async with db.begin():
-            await db.commit()
+            db.add(new_light_intensity)
+        await db.commit()
         return {"message": "Light intensity updated successfully"}
     except Exception as e:
         return {"error": str(e)}
