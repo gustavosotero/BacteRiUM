@@ -1,12 +1,24 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File
 from pydantic import BaseModel
 import boto3
 import uuid
 import paho.mqtt.publish as publish
+from typing import List
+
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-#--------------------- Models ---------------------
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Or specify your front-end origin like ["http://localhost:3000"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ------------------ Models ------------------
 class SensorData(BaseModel):
     timestamp: str
     temperature: float
@@ -30,15 +42,11 @@ class Notification(BaseModel):
     message: str
     type: str
 
-#--------------------- In-Memory State ---------------------
-latest_sensor_data: SensorDataLocalDashboard | None = None
-latest_user_control: UserControl | None = None
-
-#---------------- AWS S3 CONFIG -------------------
+# ------------------ S3 / MQTT ------------------
 AWS_BUCKET_NAME = "cyanobox-images"
 AWS_REGION = "us-east-1"
-AWS_ACCESS_KEY = ""  # Add your access key
-AWS_SECRET_KEY = ""  # Add your secret key
+AWS_ACCESS_KEY = ""
+AWS_SECRET_KEY = ""
 
 s3 = boto3.client(
     "s3",
@@ -47,20 +55,31 @@ s3 = boto3.client(
     aws_secret_access_key=AWS_SECRET_KEY
 )
 
-#---------------- IoT Core CONFIG ------------------
-IOT_BROKER = "your-iot-endpoint.amazonaws.com"  # Replace with actual endpoint
-IOT_PORT = 8883  # Use 1883 if no TLS
+IOT_BROKER = "your-iot-endpoint.amazonaws.com"
+IOT_PORT = 8883
 IOT_TOPIC_SENSOR = "bacterium/sensor"
 IOT_TOPIC_NOTIFICATION = "bacterium/notification"
 
-#--------------------- API ROUTES ---------------------
+# ------------------ WebSocket Clients ------------------
+connected_clients: List[WebSocket] = []
 
-@app.get("/")
-async def root():
-    return {"message": "Welcome to the Cyanobox LocalAPI by BacteRiUM!!!"}
+@app.websocket("/ws/sensor")
+async def sensor_websocket(websocket: WebSocket):
+    await websocket.accept()
+    connected_clients.append(websocket)
+    try:
+        while True:
+            await websocket.receive_text()  # keep alive
+    except WebSocketDisconnect:
+        connected_clients.remove(websocket)
 
-#--------------------- Pictures Endpoint ---------------------
+@app.post("/broadcast-sensor")
+async def broadcast_sensor(data: SensorDataLocalDashboard):
+    for client in connected_clients:
+        await client.send_json(data.dict())
+    return {"message": "Sensor data sent to dashboard"}
 
+# ------------------ Picture Upload ------------------
 @app.post("/upload-image")
 def upload_image(file: UploadFile = File(...)):
     filename = f"{uuid.uuid4()}.jpg"
@@ -68,8 +87,7 @@ def upload_image(file: UploadFile = File(...)):
     url = f"https://{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{filename}"
     return {"image_url": url}
 
-#--------------------- AWS IoT Core Publish Endpoints ---------------------
-
+# ------------------ IoT Core ------------------
 @app.post("/publish/sensordata")
 def publish_sensor(data: SensorData):
     payload = data.dict()
@@ -82,32 +100,21 @@ def publish_notification(notification: Notification):
     publish.single(IOT_TOPIC_NOTIFICATION, payload=str(payload), hostname=IOT_BROKER, port=IOT_PORT)
     return {"message": "Notification published to IoT Core"}
 
-#--------------------- Local Dashboard Communication ---------------------
+# ------------------ User Control ------------------
+latest_user_control: UserControl | None = None
 
-#Raspberry Pi → Local Dashboard
-@app.post("/sensor-data-local")
-def post_sensor_data_local(data: SensorDataLocalDashboard):
-    global latest_sensor_data
-    latest_sensor_data = data
-    return {"message": "Sensor data received by local dashboard"}
-
-#Dashboard → Raspberry Pi
 @app.post("/user-control")
 def post_user_control(data: UserControl):
     global latest_user_control
     latest_user_control = data
     return {"message": "User control data received by Raspberry Pi"}
 
-#Raspberry Pi GET user-defined control values
 @app.get("/user-control")
 def get_user_control():
     if latest_user_control is None:
         return {"message": "No user control data available yet"}
     return latest_user_control
 
-#Local dashboard GET latest sensor data
-@app.get("/sensor-data-local")
-def get_sensor_data_local():
-    if latest_sensor_data is None:
-        return {"message": "No sensor data available yet"}
-    return latest_sensor_data
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the Cyanobox LocalAPI by BacteRiUM!!!"}

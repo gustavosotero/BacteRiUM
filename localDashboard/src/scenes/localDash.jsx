@@ -25,37 +25,41 @@ const TouchScreen = () => {
   const [targetHumidity, setTargetHumidity] = useState(null);
   const [alertMessage, setAlertMessage] = useState(null);
 
-  // 🚀 Fetch sensor data every 3 seconds
+  // WebSocket for real-time sensor data
   useEffect(() => {
-    const fetchSensorData = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/sensor-data-local");
-        const data = await response.json();
+    const socket = new WebSocket("ws://localhost:8000/ws/sensor");
 
-        if (data.temperature !== undefined) {
-          setTempCelsius(data.temperature);
-          setHumidity(data.humidity);
-          setFanSpeed(data.fan_speed || "--");
-        }
-      } catch (error) {
-        console.error("Failed to fetch sensor data:", error);
-      }
+    socket.onopen = () => {
+      console.log("✅ WebSocket connected");
     };
 
-    fetchSensorData(); // Fetch once on load
-    const interval = setInterval(fetchSensorData, 3000); // Fetch every 3 seconds
+    socket.onmessage = (event) => {
+      console.log("📡 Data received from WebSocket:", event.data);
+      const data = JSON.parse(event.data);
+      setTempCelsius(data.temperature);
+      setHumidity(data.humidity);
+      setFanSpeed(data.fan_speed || "--");
+    };
 
-    return () => clearInterval(interval); // Clean up
+    socket.onerror = (err) => {
+      console.error("WebSocket error:", err);
+    };
+
+    socket.onclose = () => {
+      console.warn("WebSocket connection closed");
+    };
+
+    return () => socket.close();
   }, []);
 
-  // 🧪 Send user-defined values to the API
+  // Send user-defined values to the API
   const handleConfirm = async () => {
     setTargetTemp(selectedTemp);
     setTargetHumidity(selectedHumidity);
     setAlertMessage(null);
 
     try {
-      const response = await fetch("http://localhost:3000/user-control", {
+      const response = await fetch("http://localhost:8000/user-control", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -68,7 +72,7 @@ const TouchScreen = () => {
       console.log("User control response:", result);
     } catch (err) {
       console.error("Failed to send user control:", err);
-      setAlertMessage("❌ Failed to communicate with the system.");
+      setAlertMessage("Failed to communicate with the system.");
       setTimeout(() => setAlertMessage(null), 4000);
     }
   };
@@ -97,7 +101,7 @@ const TouchScreen = () => {
         gap={3}
         flexWrap="wrap"
         mt={6}
-        minHeight="50vh"
+        minHeight="70vh"
       >
         <Card sx={{ width: 300 }}>
           <CardContent>

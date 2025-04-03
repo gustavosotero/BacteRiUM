@@ -164,7 +164,7 @@ const Dashboard = () => {
       <Grid container spacing={3} justifyContent={"center"} alignItems={"center"}>
         {/* Temperature */}
         <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ height: "100px", width: "250px", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff" }}>
+          <Card sx={{ height: "100px", width: "260px", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff" }}>
             <CardContent sx={{ justifyContent: "center", alignItems: "center", textAlign: "center" }}>
               <Typography variant="h4">Temperature</Typography>
               <Typography variant="h5">24°C</Typography>
@@ -174,7 +174,7 @@ const Dashboard = () => {
 
         {/* Humidity */}
         <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ height: "100px", width: "250px", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff" }}>
+          <Card sx={{ height: "100px", width: "260px", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff" }}>
             <CardContent sx={{ justifyContent: "center", alignItems: "center", textAlign: "center" }}>
               <Typography variant="h4">Humidity</Typography>
               <Typography variant="h5">65%</Typography>
@@ -184,7 +184,7 @@ const Dashboard = () => {
 
         {/* Light Intensity */}
         <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ height: "100px", width: "250px", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff" }}>
+          <Card sx={{ height: "100px", width: "260px", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff" }}>
             <CardContent sx={{ justifyContent: "center", alignItems: "center", textAlign: "center" }}>
               <Typography variant="h4">Light Intensity</Typography>
               <Typography variant="h5">
@@ -196,7 +196,7 @@ const Dashboard = () => {
 
         {/* User Input for Light Intensity */}
         <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ height: "100px", width: "250px", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff" }}>
+          <Card sx={{ height: "100px", width: "260px", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff" }}>
             <CardContent sx={{ justifyContent: "center", alignItems: "center", textAlign: "center" }}>
               <Typography variant="h4">Update Light Intensity</Typography>
               <input
