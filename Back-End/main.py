@@ -45,7 +45,6 @@ class SensorPy(BaseModel):
     timestamp: datetime
     temperature: float
     humidity: float
-    light_intensity: float
     image_url: str | None = None
 
 class NotificationPy(BaseModel):
