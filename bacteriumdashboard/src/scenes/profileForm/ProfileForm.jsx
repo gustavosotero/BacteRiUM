@@ -1,14 +1,23 @@
 import Headers from "../../Components/Headers";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { Box, useTheme, Typography, TextField, Button } from "@mui/material";
-import { tokens } from "../../theme";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
+import axios from "axios";
 
 const checkSchema = yup.object().shape({
   fullName: yup.string().required("required"),
   email: yup.string().email("invalid email").required("required"),
-  role: yup.string().required("required"),
+  role: yup.string().oneOf(["Admin", "User"]).required("required"),
 });
 
 const initialValues = {
@@ -20,8 +29,31 @@ const initialValues = {
 const ProfileForm = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
-  const handleFormSubmit = (values) => {
-    console.log("Submitted values:", values);
+  const handleFormSubmit = async (values, { resetForm }) => {
+    const roleMapping = {
+      Admin: 1,
+      User: 2,
+    };
+
+    const userPayload = {
+      email: values.email,
+      name: values.fullName,
+      role: roleMapping[values.role]
+    };
+
+    try {
+      const response = axios.post("http://54.235.58.122:8000/users/", userPayload); //await
+      console.log("User created:", response.data);
+      alert("User successfully created!");
+      resetForm();
+    } catch (error) {
+      console.error("Failed to create user:", error);
+      if (error.response) {
+        alert(`API error: ${error.response.status} - ${error.response.data.detail || "Unknown error"}`);
+      } else {
+        alert("Failed to connect to the server.");
+      }
+    }
   };
 
   return (
@@ -32,7 +64,7 @@ const ProfileForm = () => {
         initialValues={initialValues}
         validationSchema={checkSchema}
       >
-        {({ handleBlur, handleChange, handleSubmit, values, touched, errors }) => (
+        {({ handleBlur, handleChange, handleSubmit, values, touched, errors, setFieldValue }) => (
           <form onSubmit={handleSubmit}>
             <Box
               display="grid"
@@ -55,23 +87,25 @@ const ProfileForm = () => {
                 variant="filled"
                 sx={{ gridColumn: "span 1" }}
               />
+
+              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 1" }}>
+                <InputLabel>Role</InputLabel>
+                <Select
+                  name="role"
+                  value={values.role}
+                  onChange={(e) => setFieldValue("role", e.target.value)}
+                  onBlur={handleBlur}
+                  error={!!touched.role && !!errors.role}
+                >
+                  <MenuItem value="Admin">Admin</MenuItem>
+                  <MenuItem value="User">User</MenuItem>
+                </Select>
+              </FormControl>
+
               <TextField
                 onChange={handleChange}
                 onBlur={handleBlur}
-                type="text"
-                label="Role"
-                value={values.role}
-                name="role"
-                error={!!touched.role && !!errors.role}
-                helperText={touched.role && errors.role}
-                fullWidth
-                variant="filled"
-                sx={{ gridColumn: "span 1" }}
-              />
-              <TextField
-                onChange={handleChange}
-                onBlur={handleBlur}
-                type="text"
+                type="email"
                 label="Email"
                 value={values.email}
                 name="email"
@@ -83,7 +117,7 @@ const ProfileForm = () => {
               />
             </Box>
             <Box display="flex" justifyContent="end" mt="10px">
-            <Button type="submit" variant="contained" color="secondary">
+              <Button type="submit" variant="contained" color="secondary">
                 Create New User
               </Button>
             </Box>
