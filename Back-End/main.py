@@ -121,7 +121,7 @@ async def delete_user(email: str, db: AsyncSession = Depends(get_db)):
 async def create_sensor_data(sensor: SensorPy, db: AsyncSession = Depends(get_db)):
     try:
         async with db.begin():
-            result = await db.execute(text("SELECT * FROM light_intensity"))
+            result = await db.execute(select(LightIntensity.value).order_by(LightIntensity.id.desc()).limit(1))
             latest_light_intensity = result.scalar_one_or_none()
             new_sensor_data = SensorReading(
                 timestamp=sensor.timestamp,
