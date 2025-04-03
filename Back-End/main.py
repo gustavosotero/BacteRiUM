@@ -1,8 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column, String, Float, Integer, DateTime, text
-from sqlalchemy.future import select
+from sqlalchemy import Column, String, Float, Integer, DateTime, text, select, delete
 from pydantic import BaseModel
 from datetime import datetime
 from datetime import datetime, timedelta
@@ -106,7 +105,7 @@ async def delete_user(email: str, db: AsyncSession = Depends(get_db)):
     user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    await db.execute(select(User).where(User.email == email))
+    await db.execute(delete(User).where(User.email == email))
     await db.commit()
     return {"message": "User deleted"}
 
