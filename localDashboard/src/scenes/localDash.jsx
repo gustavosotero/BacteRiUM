@@ -10,13 +10,13 @@ import {
   InputLabel,
   Alert
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Headers from "../components/Headers";
-// import logo from "../assets/logo.png"; // ✅ Replace with actual path to your logo
 
 const TouchScreen = () => {
   const [tempCelsius, setTempCelsius] = useState(22);
   const [humidity, setHumidity] = useState(60);
+  const [fanSpeed, setFanSpeed] = useState("--");
 
   const [selectedTemp, setSelectedTemp] = useState(22);
   const [selectedHumidity, setSelectedHumidity] = useState(60);
@@ -25,42 +25,63 @@ const TouchScreen = () => {
   const [targetHumidity, setTargetHumidity] = useState(null);
   const [alertMessage, setAlertMessage] = useState(null);
 
-  const handleConfirm = () => {
+  // 🚀 Fetch sensor data every 3 seconds
+  useEffect(() => {
+    const fetchSensorData = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/sensor-data-local");
+        const data = await response.json();
+
+        if (data.temperature !== undefined) {
+          setTempCelsius(data.temperature);
+          setHumidity(data.humidity);
+          setFanSpeed(data.fan_speed || "--");
+        }
+      } catch (error) {
+        console.error("Failed to fetch sensor data:", error);
+      }
+    };
+
+    fetchSensorData(); // Fetch once on load
+    const interval = setInterval(fetchSensorData, 3000); // Fetch every 3 seconds
+
+    return () => clearInterval(interval); // Clean up
+  }, []);
+
+  // 🧪 Send user-defined values to the API
+  const handleConfirm = async () => {
     setTargetTemp(selectedTemp);
     setTargetHumidity(selectedHumidity);
     setAlertMessage(null);
 
-    console.log("Simulated user target:", {
-      temperature: selectedTemp,
-      humidity: selectedHumidity
-    });
+    try {
+      const response = await fetch("http://localhost:3000/user-control", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          target_temperature: selectedTemp,
+          target_humidity: selectedHumidity
+        })
+      });
 
-    const simulatedFail = Math.random() < 0.3;
-    if (simulatedFail) {
-      setAlertMessage("❌ El sistema no se reguló al valor deseado.");
-      setTimeout(() => setAlertMessage(null), 4000); // auto-dismiss after 4 seconds
+      const result = await response.json();
+      console.log("User control response:", result);
+    } catch (err) {
+      console.error("Failed to send user control:", err);
+      setAlertMessage("❌ Failed to communicate with the system.");
+      setTimeout(() => setAlertMessage(null), 4000);
     }
   };
 
   return (
     <Box minHeight="100vh" p={4}>
-      {/* Header Row: Logo + Centered Title */}
       <Box display="flex" alignItems="center" justifyContent="space-between">
-        {/* <Box>
-          <img 
-          src="BacteRiUM logo.png" 
-          style={{ height: "90px", marginRight: "20px" }} 
-          />
-        </Box> */}
-
         <Box flex={1} textAlign="center" marginBottom={-60}>
           <Headers title="Local Dashboard" />
         </Box>
-
-        <Box width={60} /> {/* Empty box to balance logo space */}
+        <Box width={60} />
       </Box>
- 
-      {/* Alert */}
+
       {alertMessage && (
         <Box mt={2} display="flex" justifyContent="center">
           <Alert severity="error" sx={{ width: "100%", maxWidth: 400 }}>
@@ -69,7 +90,6 @@ const TouchScreen = () => {
         </Box>
       )}
 
-      {/* Sensor Data Cards */}
       <Box
         display="flex"
         justifyContent="center"
@@ -96,12 +116,11 @@ const TouchScreen = () => {
         <Card sx={{ width: 300 }}>
           <CardContent>
             <Typography variant="h6" align="center">Fan Speed</Typography>
-            <Typography variant="h4" align="center">-- RPM</Typography>
+            <Typography variant="h4" align="center">{fanSpeed} RPM</Typography>
           </CardContent>
         </Card>
       </Box>
 
-      {/* Controls */}
       <Box display="flex" justifyContent="center" gap={4} mt={5} flexWrap="wrap" marginTop={-30}>
         <FormControl sx={{ minWidth: 180 }}>
           <InputLabel>Temperature (°C)</InputLabel>
@@ -138,7 +157,6 @@ const TouchScreen = () => {
         </Button>
       </Box>
 
-      {/* Target Display */}
       {(targetTemp !== null || targetHumidity !== null) && (
         <Box mt={3} textAlign="center">
           <Typography variant="subtitle1" color="textSecondary">
