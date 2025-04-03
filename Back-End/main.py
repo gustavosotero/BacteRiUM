@@ -135,7 +135,7 @@ async def create_sensor_data(sensor: SensorPy, db: AsyncSession = Depends(get_db
     return {"message": "Sensor data added", "light_intensity": new_sensor_data.light_intensity}
 
 @app.post("/light_intensity/")
-async def set_light_intensity(light_intensity: LightIntensityPayload, db: AsyncSession = Depends(get_db)):
+async def set_light_intensity(light_intensity: LightIntensityPy, db: AsyncSession = Depends(get_db)):
     try:
         async with db.begin():
             await db.execute(delete(LightIntensity))
