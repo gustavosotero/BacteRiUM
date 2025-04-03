@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 #Database setup
-DATABASE_URL = "postgresql://cyanobox_admin:AYmc1LRD9PPGcH8KbGhE@cyanobox-db.cu3weo4yye22.us-east-1.rds.amazonaws.com/cyanobox"
+DATABASE_URL = "postgresql+asyncpg://cyanobox_admin:AYmc1LRD9PPGcH8KbGhE@cyanobox-db.cu3weo4yye22.us-east-1.rds.amazonaws.com/cyanobox"
 engine = create_async_engine(DATABASE_URL, echo=True)
 SessionLocal = async_sessionmaker(bind=engine, expire_on_commit=False)
 Base = declarative_base()
