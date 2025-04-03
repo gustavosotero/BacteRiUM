@@ -42,7 +42,7 @@ const ProfileForm = () => {
     };
 
     try {
-      const response = axios.post("http://54.235.58.122:8000/users/", userPayload); //await
+      const response = await axios.post("http://54.235.58.122:8000/users/", userPayload); 
       console.log("User created:", response.data);
       alert("User successfully created!");
       resetForm();
