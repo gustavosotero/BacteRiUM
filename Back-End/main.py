@@ -53,7 +53,7 @@ class NotificationPy(BaseModel):
     text: str
     type: int
 
-class LightIntensityPayload(BaseModel):
+class LightIntensityPy(BaseModel):
     value: float
 
 #Database models
@@ -135,15 +135,10 @@ async def create_sensor_data(sensor: SensorPy, db: AsyncSession = Depends(get_db
     return {"message": "Sensor data added", "light_intensity": new_sensor_data.light_intensity}
 
 @app.post("/light_intensity/")
-async def set_light_intensity(payload: LightIntensityPayload, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(LightIntensity).order_by(LightIntensity.id.desc()).limit(1))
-    existing_light_intensity = result.scalar_one_or_none()
-    if existing_light_intensity:
-        existing_light_intensity.value = payload.value
-        db.add(existing_light_intensity) 
-    else:
-        new_light_intensity = LightIntensity(value=payload.value)
-        db.add(new_light_intensity)
+async def set_light_intensity(light_intensity: LightIntensityPy, db: AsyncSession = Depends(get_db)):
+    await db.execute(delete(LightIntensity))
+    new_light_intensity = LightIntensity(value = light_intensity.value)
+    db.add(new_light_intensity)
     async with db.begin():
         await db.commit()
     return {"message": "Light intensity updated successfully"}
