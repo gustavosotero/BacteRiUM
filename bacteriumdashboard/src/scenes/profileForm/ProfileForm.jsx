@@ -34,39 +34,27 @@ const ProfileForm = () => {
       Admin: 1,
       User: 2,
     };
-  
+
     const userPayload = {
       email: values.email,
       name: values.fullName,
-      role: roleMapping[values.role],
+      role: roleMapping[values.role]
     };
-  
+
     try {
-      console.log("Sending userPayload:", userPayload);
-  
-      const response = await fetch("http://54.235.58.122:8000/users/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userPayload),
-      });
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`API Error ${response.status}: ${errorData.detail || "Unknown error"}`);
-      }
-  
-      const result = await response.json();
-      console.log("User created:", result);
+      const response = axios.post("http://54.235.58.122:8000/users/", userPayload); //await
+      console.log("User created:", response.data);
       alert("User successfully created!");
       resetForm();
     } catch (error) {
       console.error("Failed to create user:", error);
-      alert(`Failed to create user: ${error.message}`);
+      if (error.response) {
+        alert(`API error: ${error.response.status} - ${error.response.data.detail || "Unknown error"}`);
+      } else {
+        alert("Failed to connect to the server.");
+      }
     }
   };
-  
 
   return (
     <Box margin="20px">
