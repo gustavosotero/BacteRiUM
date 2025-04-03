@@ -8,6 +8,7 @@ from datetime import datetime
 from datetime import datetime, timedelta
 import os
 import logging
+from fastapi.middleware.cors import CORSMiddleware
 
 #Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -20,6 +21,15 @@ SessionLocal = async_sessionmaker(bind=engine, expire_on_commit=False)
 Base = declarative_base()
 
 app = FastAPI()
+
+#CORS Header for Front-End Connection
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # localhost must be changed when web page is deployed
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 #database session
 async def get_db():
