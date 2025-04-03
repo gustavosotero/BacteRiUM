@@ -135,13 +135,12 @@ async def create_sensor_data(sensor: SensorPy, db: AsyncSession = Depends(get_db
     return {"message": "Sensor data added", "light_intensity": new_sensor_data.light_intensity}
 
 @app.post("/light_intensity/")
-async def set_light_intensity(light_intensity: LightIntensityPy, db: AsyncSession = Depends(get_db)):
+async def set_light_intensity(light_intensity: LightIntensityPayload, db: AsyncSession = Depends(get_db)):
     try:
-        await db.execute(delete(LightIntensity))
-        new_light_intensity = LightIntensity(value=light_intensity.value)
         async with db.begin():
+            await db.execute(delete(LightIntensity))
+            new_light_intensity = LightIntensity(value=light_intensity.value)
             db.add(new_light_intensity)
-        await db.commit()
         return {"message": "Light intensity updated successfully"}
     except Exception as e:
         return {"error": str(e)}
