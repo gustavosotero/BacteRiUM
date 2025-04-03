@@ -53,6 +53,9 @@ class NotificationPy(BaseModel):
     text: str
     type: int
 
+class LightIntensityPayload(BaseModel):
+    value: float
+
 #Database models
 class User(Base):
     __tablename__ = "users"
@@ -74,6 +77,11 @@ class Notification(Base):
     timestamp = Column(DateTime, nullable=False)
     text = Column(String, nullable=False)
     type = Column(Integer, nullable=False)
+
+class LightIntensity(Base):
+    __tablename__ = "light_intensity"
+    id = Column(Integer, primary_key=True, index=True)
+    value = Column(Float, nullable=False)
 
 #Routes
 
@@ -112,11 +120,33 @@ async def delete_user(email: str, db: AsyncSession = Depends(get_db)):
 ##Create sensor reading
 @app.post("/sensors/")
 async def create_sensor_data(sensor: SensorPy, db: AsyncSession = Depends(get_db)):
-    new_sensor_data = SensorReading(**sensor.dict())
+    result = await db.execute(select(LightIntensity.value).order_by(LightIntensity.id.desc()).limit(1))
+    latest_light_intensity = result.scalar_one_or_none()
+    new_sensor_data = SensorReading(
+        timestamp=sensor.timestamp,
+        temperature=sensor.temperature,
+        humidity=sensor.humidity,
+        light_intensity=latest_light_intensity if latest_light_intensity is not None else 0.0,
+        image_url=sensor.image_url
+    )
     async with db.begin():
         db.add(new_sensor_data)
     await db.commit()
-    return {"message": "Sensor data added"}
+    return {"message": "Sensor data added", "light_intensity": new_sensor_data.light_intensity}
+
+@app.post("/light_intensity/")
+async def set_light_intensity(payload: LightIntensityPayload, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(LightIntensity).order_by(LightIntensity.id.desc()).limit(1))
+    existing_light_intensity = result.scalar_one_or_none()
+    if existing_light_intensity:
+        existing_light_intensity.value = payload.value
+        db.add(existing_light_intensity) 
+    else:
+        new_light_intensity = LightIntensity(value=payload.value)
+        db.add(new_light_intensity)
+    async with db.begin():
+        await db.commit()
+    return {"message": "Light intensity updated successfully"}
 
 ##Get sensor readings (from date range)
 @app.get("/sensors/")

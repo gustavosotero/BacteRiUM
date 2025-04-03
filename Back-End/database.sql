@@ -23,6 +23,11 @@ CREATE TABLE notifications (
     type INTEGER NOT NULL CHECK (type IN (1, 2))
 );
 
+CREATE TABLE light_intensity (
+    id SERIAL PRIMARY KEY,
+    value FLOAT NOT NULL
+);
+
 CREATE EXTENSION IF NOT EXISTS timescaledb;
 
 SELECT create_hypertable('sensors', 'timestamp');
