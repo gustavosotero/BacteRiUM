@@ -10,6 +10,8 @@ import logging
 import paho.mqtt.client as mqtt
 from mqtt_client import start_mqtt
 from fastapi.middleware.cors import CORSMiddleware
+import threading
+import asyncio
 
 #Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -21,7 +23,16 @@ engine = create_async_engine(DATABASE_URL, echo=True)
 SessionLocal = async_sessionmaker(bind=engine, expire_on_commit=False)
 Base = declarative_base()
 
-app = FastAPI()
+#MQTT File Startup
+async def lifespan(app: FastAPI):
+    loop = asyncio.get_event_loop()
+    thread = threading.Thread(target=start_mqtt)
+    thread.daemon = True
+    thread.start()
+    yield 
+
+#Starts App
+app = FastAPI(lifespan=lifespan)
 
 #CORS Header for Front-End Connection
 app.add_middleware(
@@ -253,7 +264,6 @@ async def get_notifications(db: AsyncSession = Depends(get_db)):
 #uvicorn setup
 if __name__ == "__main__":
     import uvicorn
-    start_mqtt()
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
 #dates
