@@ -13,7 +13,7 @@ PATH_TO_CERT = "certs/certificate.pem.crt"
 PATH_TO_KEY = "certs/private.pem.key"
 PATH_TO_ROOT = "certs/AmazonRootCA1.pem"
 
-FASTAPI_URL = "http://localhost:8000"
+FASTAPI_URL = "http://127.0.0.1:8000"
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code", rc)
