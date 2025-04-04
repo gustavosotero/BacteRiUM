@@ -7,6 +7,8 @@ from datetime import datetime
 from datetime import datetime, timedelta
 import os
 import logging
+import paho.mqtt.client as mqtt
+from mqtt_client import start_mqtt
 from fastapi.middleware.cors import CORSMiddleware
 
 #Configure logging
@@ -251,6 +253,7 @@ async def get_notifications(db: AsyncSession = Depends(get_db)):
 #uvicorn setup
 if __name__ == "__main__":
     import uvicorn
+    start_mqtt()
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
 #dates
