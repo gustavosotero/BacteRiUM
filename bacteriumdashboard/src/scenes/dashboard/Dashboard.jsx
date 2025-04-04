@@ -66,7 +66,6 @@ const Dashboard = () => {
   const [showDialog, setShowDialog] = useState(false);
   const [pendingLightValue, setPendingLightValue] = useState("");
 
-  // Fetch current light intensity on load
   useEffect(() => {
     fetchCurrentLightIntensity();
   }, []);
@@ -81,7 +80,6 @@ const Dashboard = () => {
     }
   };
 
-  // Dummy chart data
   const dummyChartData = {
     labels: Array.from({ length: 30 }, (_, i) => dayjs().subtract(i, "day").format("YYYY-MM-DD")),
     datasets: [
@@ -97,6 +95,7 @@ const Dashboard = () => {
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: { position: "top" },
       tooltip: { mode: "index", intersect: false },
@@ -111,6 +110,11 @@ const Dashboard = () => {
           display: true,
           text: "Date",
         },
+        ticks: {
+          maxRotation: 45,
+          minRotation: 0,
+          autoSkip: true,
+        },
       },
       y: {
         beginAtZero: true,
@@ -120,13 +124,17 @@ const Dashboard = () => {
         },
       },
     },
+    layout: {
+      padding: {
+        bottom: 20,
+      },
+    },
   };
 
   return (
-    <Box margin={"20px"}>
+    <Box p={{ xs: 2, sm: 3, md: 4 }}>
       <Headers title={"Dashboard"} />
 
-      {/* Confirmation Dialog */}
       <Dialog open={showDialog} onClose={() => setShowDialog(false)}>
         <DialogTitle>Confirm Light Intensity Submission</DialogTitle>
         <DialogContent>
@@ -160,102 +168,75 @@ const Dashboard = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Top Cards */}
-      <Grid container spacing={3} justifyContent={"center"} alignItems={"center"}>
-        {/* Temperature */}
-        <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ height: "100px", width: "260px", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff" }}>
-            <CardContent sx={{ justifyContent: "center", alignItems: "center", textAlign: "center" }}>
-              <Typography variant="h4">Temperature</Typography>
-              <Typography variant="h5">24°C</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Humidity */}
-        <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ height: "100px", width: "260px", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff" }}>
-            <CardContent sx={{ justifyContent: "center", alignItems: "center", textAlign: "center" }}>
-              <Typography variant="h4">Humidity</Typography>
-              <Typography variant="h5">65%</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Light Intensity */}
-        <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ height: "100px", width: "260px", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff" }}>
-            <CardContent sx={{ justifyContent: "center", alignItems: "center", textAlign: "center" }}>
-              <Typography variant="h4">Light Intensity</Typography>
-              <Typography variant="h5">
-                {currentLightValue !== null ? `${currentLightValue} lux` : "Loading..."}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* User Input for Light Intensity */}
-        <Grid item xs={12} sm={6} md={2}>
-          <Card sx={{ height: "100px", width: "260px", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff" }}>
-            <CardContent sx={{ justifyContent: "center", alignItems: "center", textAlign: "center" }}>
-              <Typography variant="h4">Update Light Intensity</Typography>
-              <input
-                type="numeric"
-                value={newLightValue}
-                onChange={(e) => setNewLightValue(e.target.value)}
-                placeholder="Enter new value"
-                style={{
-                  width: "53%",
-                  padding: "10px",
-                  marginTop: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                }}
-              />
-              <MUIButton
-                variant="contained"
-                sx={{ marginTop: "-4px", marginLeft: "10px", bgcolor: colors.blueAccent[700] }}
-                onClick={() => {
-                  setPendingLightValue(newLightValue);
-                  setShowDialog(true);
-                }}
-              >
-                Submit
-              </MUIButton>
-            </CardContent>
-          </Card>
-        </Grid>
+      {/* Responsive Grid Cards */}
+      <Grid container spacing={2} justifyContent="center">
+        {[
+          { label: "Temperature", value: "24°C" },
+          { label: "Humidity", value: "65%" },
+          { label: "Light Intensity", value: currentLightValue !== null ? `${currentLightValue} lux` : "Loading..." },
+          {
+            label: "Update Light Intensity",
+            custom: (
+              <>
+                <input
+                  type="numeric"
+                  value={newLightValue}
+                  onChange={(e) => setNewLightValue(e.target.value)}
+                  placeholder="Enter new value"
+                  style={{
+                    width: "50%",
+                    padding: "6px",
+                    marginTop: "8px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                  }}
+                />
+                <MUIButton
+                  variant="contained"
+                  sx={{ ml: 1, mt: 1, bgcolor: colors.blueAccent[700] }}
+                  onClick={() => {
+                    setPendingLightValue(newLightValue);
+                    setShowDialog(true);
+                  }}
+                >
+                  Submit
+                </MUIButton>
+              </>
+            ),
+          },
+        ].map((item, index) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+            <Card sx={{ height: "100%", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff" }}>
+              <CardContent sx={{ textAlign: "center" }}>
+                <Typography variant="h6">{item.label}</Typography>
+                {item.custom ? item.custom : <Typography variant="body1">{item.value}</Typography>}
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
       </Grid>
 
-      {/* Charts */}
-      <Grid container spacing={3} marginTop={-1} justifyContent="center">
-        <Grid item xs={12} sm={6} md={4}>
-          <Box minHeight="300px" bgcolor="#fff" p={2} borderRadius={2} boxShadow={2}>
-            <Typography variant="h5" color="#000000" mb={2}>Monthly Temperature</Typography>
-            <Line data={dummyChartData} options={chartOptions} />
-          </Box>
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <Box minHeight="300px" bgcolor="#fff" p={2} borderRadius={2} boxShadow={2}>
-            <Typography variant="h5" color="#000000" mb={2}>Monthly Humidity</Typography>
-            <Line data={dummyChartData} options={chartOptions} />
-          </Box>
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <Box minHeight="300px" bgcolor="#fff" p={2} borderRadius={2} boxShadow={2}>
-            <Typography variant="h5" color="#000000" mb={2}>Monthly Light Intensity</Typography>
-            <Line data={dummyChartData} options={chartOptions} />
-          </Box>
-        </Grid>
+      {/* Charts Section */}
+      <Grid container spacing={2} mt={2}>
+        {["Monthly Temperature", "Monthly Humidity", "Monthly Light Intensity"].map((title, idx) => (
+          <Grid item xs={12} sm={12} md={6} lg={4} key={idx}>
+            <Box height={360} bgcolor="#fff" p={2} borderRadius={2} boxShadow={2}>
+              <Typography variant="h6" mb={1}>{title}</Typography>
+              <Box height={300}>
+                <Line data={dummyChartData} options={chartOptions} />
+              </Box>
+            </Box>
+          </Grid>
+        ))}
       </Grid>
 
       {/* Last Captured Picture */}
-      <Box mt={2}>
-        <Typography variant="h3">Last Captured Picture</Typography>
+      <Box mt={4}>
+        <Typography variant="h5" mb={2}>Last Captured Picture</Typography>
         <Box
           sx={{
             width: "100%",
-            height: 300,
+            height: { xs: 200, sm: 250, md: 300 },
             border: "1px solid #ccc",
             borderRadius: "10px",
             display: "flex",

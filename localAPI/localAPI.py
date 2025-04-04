@@ -2,16 +2,82 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File
 from pydantic import BaseModel
 import boto3
 import uuid
-import paho.mqtt.publish as publish
+import ssl
+import paho.mqtt.client as mqtt
+import logging
 from typing import List
 
 from fastapi.middleware.cors import CORSMiddleware
+
+# ------------------ AWS IoT Core MQTT Config ------------------
+IOT_BROKER = "a2sdtsja14nb5p-ats.iot.us-east-1.amazonaws.com"
+IOT_PORT = 8883
+CLIENT_ID = "cyanobox-localAPI"
+
+CERT_PATH = "certs/device-certificate.pem.crt"
+KEY_PATH = "certs/private.pem.key"
+CA_PATH = "certs/AmazonRootCA1.pem"
+
+IOT_TOPIC_SENSOR = "cyanobox/sensor"
+IOT_TOPIC_NOTIFICATION = "cyanobox/notification"
+IOT_TOPIC_RT_TEMP = "cyanobox/temperature"
+IOT_TOPIC_RT_HUM = "cyanobox/humidity"
+
+# ------------------ MQTT Publisher Helper ------------------
+def publish_mqtt_message(topic: str, payload: str):
+    import logging
+
+    print(f"📡 Preparing to publish to topic: {topic}")
+    print(f"📦 Payload: {payload}")
+
+    # Set up logger
+    logger = logging.getLogger("mqtt")
+    logging.basicConfig(level=logging.DEBUG)
+
+    client = mqtt.Client(client_id=CLIENT_ID)
+    client.enable_logger(logger)
+
+    # Callbacks
+    def on_connect(client, userdata, flags, rc):
+        if rc == 0:
+            print("✅ MQTT Connected successfully.")
+        else:
+            print(f"❌ MQTT Connection failed with code {rc}.")
+
+    def on_publish(client, userdata, mid):
+        print(f"📨 Message published successfully with mid: {mid}")
+
+    def on_disconnect(client, userdata, rc):
+        print("🔌 MQTT Disconnected.")
+
+    # Assign callbacks
+    client.on_connect = on_connect
+    client.on_publish = on_publish
+    client.on_disconnect = on_disconnect
+
+    try:
+        client.tls_set(
+            ca_certs=CA_PATH,
+            certfile=CERT_PATH,
+            keyfile=KEY_PATH,
+            tls_version=ssl.PROTOCOL_TLSv1_2,
+        )
+        client.connect(IOT_BROKER, IOT_PORT)
+        client.loop_start()
+
+        result = client.publish(topic, payload)
+        result.wait_for_publish()
+
+        client.loop_stop()
+        client.disconnect()
+    except Exception as e:
+        print(f"💥 Error during MQTT publish: {e}")
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Or specify your front-end origin like ["http://localhost:3000"]
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -22,9 +88,13 @@ class SensorData(BaseModel):
     timestamp: str
     temperature: float
     humidity: float
-    light_intensity: float
-    fan_speed: float
     image_url: str = ""
+
+class RT_Temperature(BaseModel):
+    value: float
+
+class RT_Humidity(BaseModel):
+    value: float
 
 class SensorDataLocalDashboard(BaseModel):
     temperature: float
@@ -54,10 +124,6 @@ s3 = boto3.client(
     aws_secret_access_key=AWS_SECRET_KEY
 )
 
-IOT_BROKER = "your-iot-endpoint.amazonaws.com"
-IOT_PORT = 8883
-IOT_TOPIC_SENSOR = "bacterium/sensor"
-IOT_TOPIC_NOTIFICATION = "bacterium/notification"
 
 # ------------------ WebSocket Clients ------------------
 connected_clients: List[WebSocket] = []
@@ -86,18 +152,30 @@ def upload_image(file: UploadFile = File(...)):
     url = f"https://{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{filename}"
     return {"image_url": url}
 
-# ------------------ IoT Core ------------------
+# ------------------ IoT Core MQTT Endpoints ------------------
 @app.post("/publish/sensordata")
 def publish_sensor(data: SensorData):
-    payload = data.dict()
-    publish.single(IOT_TOPIC_SENSOR, payload=str(payload), hostname=IOT_BROKER, port=IOT_PORT)
-    return {"message": "Sensor data published to IoT Core"}
+    payload = data.model_dump_json()
+    publish_mqtt_message(IOT_TOPIC_SENSOR, payload)
+    return {"message": "Sensor data published to AWS IoT Core"}
 
 @app.post("/publish/notification")
 def publish_notification(notification: Notification):
-    payload = notification.dict()
-    publish.single(IOT_TOPIC_NOTIFICATION, payload=str(payload), hostname=IOT_BROKER, port=IOT_PORT)
-    return {"message": "Notification published to IoT Core"}
+    payload = notification.model_dump_json()
+    publish_mqtt_message(IOT_TOPIC_NOTIFICATION, payload)
+    return {"message": "Notification published to AWS IoT Core"}
+
+@app.post("/publish/temperature")
+def publish_temperature(temperature: RT_Temperature):
+    payload = temperature.model_dump_json()
+    publish_mqtt_message(IOT_TOPIC_RT_TEMP, payload)
+    return {"message": "Real-time temperature published to AWS IoT Core"}
+
+@app.post("/publish/humidity")
+def publish_humidity(humidity: RT_Humidity):
+    payload = humidity.model_dump_json()
+    publish_mqtt_message(IOT_TOPIC_RT_HUM, payload)
+    return {"message": "Real-time humidity published to AWS IoT Core"}
 
 # ------------------ User Control ------------------
 latest_user_control: UserControl | None = None
