@@ -47,6 +47,12 @@ def on_message(client, userdata, msg):
     except Exception as e:
         print("Error handling message:", e)
 
+def on_disconnect(client, userdata, rc):
+    print(f"Disconnected with result code {rc}")
+    if rc != 0:
+        print("Attempting to reconnect...")
+        client.reconnect()
+
 def start_mqtt():
     client = mqtt.Client(client_id=CLIENT_ID)
     client.tls_set(ca_certs=PATH_TO_ROOT,
@@ -55,7 +61,7 @@ def start_mqtt():
                    tls_version=ssl.PROTOCOL_TLSv1_2)
     client.on_connect = on_connect
     client.on_message = on_message
+    client.on_disconnect = on_disconnect
 
     client.connect(ENDPOINT, PORT)
-    thread = threading.Thread(target=client.loop_forever)
-    thread.start()
+    client.loop_start()
