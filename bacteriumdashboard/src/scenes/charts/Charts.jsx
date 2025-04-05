@@ -200,7 +200,7 @@ const Charts = () => {
                 </DateInput>
                 <Button>▼</Button>
               </Group>
-              <Popover className={`react-aria-Popover ${isDarkMode ? "dark-mode" : ""}`}>
+              <Popover className={`react-aria-Popover ${isDarkMode ? "dark-mode" : ""}`} >
                 <Dialog>
                 <RangeCalendar value={dateRange} onChange={setDateRange}>
                     <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -230,7 +230,7 @@ const Charts = () => {
       </Box>
 
       {/* Charts */}
-      <Grid container spacing={2} justifyContent="center" sx={{ml: -27, mt:-7.4}}>
+      <Grid container spacing={2} justifyContent={"left"}>
         <Grid item xs={12} sm={6} md={4.5}>
           <Box minHeight="300px" bgcolor="#fff" p={2} borderRadius={2} boxShadow={2}>
             <Typography color="#000000"  variant="h5" mb={2}>Temperature</Typography>

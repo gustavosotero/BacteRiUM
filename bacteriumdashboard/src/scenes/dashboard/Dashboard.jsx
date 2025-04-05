@@ -1,10 +1,11 @@
+// src/pages/Dashboard.jsx
+
 import React, { useState, useEffect } from "react";
 import Headers from "../../Components/Headers";
+import MainLayout from "../../Components/MainLayout";
 import {
   Box,
   Button as MUIButton,
-  Menu,
-  MenuItem,
   Typography,
   useTheme,
   Grid,
@@ -17,21 +18,6 @@ import {
   DialogActions,
 } from "@mui/material";
 import { tokens } from "../../theme";
-import {
-  DateRangePicker,
-  DateInput,
-  DateSegment,
-  Label,
-  Group,
-  Button,
-  Popover,
-  Dialog as AriaDialog,
-  RangeCalendar,
-  CalendarGrid,
-  CalendarCell,
-  Heading,
-} from "react-aria-components";
-import { parseDate } from "@internationalized/date";
 import dayjs from "dayjs";
 import { Line } from "react-chartjs-2";
 import {
@@ -103,38 +89,23 @@ const Dashboard = () => {
     scales: {
       x: {
         type: "time",
-        time: {
-          unit: "day",
-        },
-        title: {
-          display: true,
-          text: "Date",
-        },
-        ticks: {
-          maxRotation: 45,
-          minRotation: 0,
-          autoSkip: true,
-        },
+        time: { unit: "day" },
+        title: { display: true, text: "Date" },
+        ticks: { maxRotation: 45, minRotation: 0, autoSkip: true },
       },
       y: {
         beginAtZero: true,
-        title: {
-          display: true,
-          text: "Value",
-        },
+        title: { display: true, text: "Value" },
       },
     },
-    layout: {
-      padding: {
-        bottom: 20,
-      },
-    },
+    layout: { padding: { bottom: 20 } },
   };
 
   return (
-    <Box p={{ xs: 2, sm: 3, md: 4 }}>
+    <Box margin={"20px"}>
       <Headers title={"Dashboard"} />
 
+      {/* Light submission dialog */}
       <Dialog open={showDialog} onClose={() => setShowDialog(false)}>
         <DialogTitle>Confirm Light Intensity Submission</DialogTitle>
         <DialogContent>
@@ -143,9 +114,7 @@ const Dashboard = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <MUIButton onClick={() => setShowDialog(false)} color="primary">
-            Cancel
-          </MUIButton>
+          <MUIButton onClick={() => setShowDialog(false)} color="primary">Cancel</MUIButton>
           <MUIButton
             onClick={async () => {
               try {
@@ -168,12 +137,15 @@ const Dashboard = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Responsive Grid Cards */}
+      {/* Info Cards */}
       <Grid container spacing={2} justifyContent="center">
         {[
           { label: "Temperature", value: "24°C" },
           { label: "Humidity", value: "65%" },
-          { label: "Light Intensity", value: currentLightValue !== null ? `${currentLightValue} lux` : "Loading..." },
+          {
+            label: "Light Intensity",
+            value: currentLightValue !== null ? `${currentLightValue} lux` : "Loading...",
+          },
           {
             label: "Update Light Intensity",
             custom: (
@@ -204,8 +176,8 @@ const Dashboard = () => {
               </>
             ),
           },
-        ].map((item, index) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+        ].map((item, i) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={i}>
             <Card sx={{ height: "100%", backgroundColor: theme.palette.mode === "dark" ? "#2C2B30" : "#fff" }}>
               <CardContent sx={{ textAlign: "center" }}>
                 <Typography variant="h6">{item.label}</Typography>
@@ -216,7 +188,7 @@ const Dashboard = () => {
         ))}
       </Grid>
 
-      {/* Charts Section */}
+      {/* Charts */}
       <Grid container spacing={2} mt={2}>
         {["Monthly Temperature", "Monthly Humidity", "Monthly Light Intensity"].map((title, idx) => (
           <Grid item xs={12} sm={12} md={6} lg={4} key={idx}>
@@ -230,25 +202,29 @@ const Dashboard = () => {
         ))}
       </Grid>
 
-      {/* Last Captured Picture */}
+      {/* Last Captured Image */}
       <Box mt={4}>
         <Typography variant="h5" mb={2}>Last Captured Picture</Typography>
-        <Box
-          sx={{
-            width: "100%",
-            height: { xs: 200, sm: 250, md: 300 },
-            border: "1px solid #ccc",
-            borderRadius: "10px",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            overflow: "hidden",
-            backgroundColor: "#f9f9f9",
-          }}
-        >
-          <Typography variant="body1" color="text.secondary">
-            Image Placeholder
-          </Typography>
+        <Box display="flex" justifyContent="center">
+          <Box
+            sx={{
+              width: "30%",
+              height: 200,
+              border: "1px solid #ccc",
+              borderRadius: "10px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              overflow: "hidden",
+              backgroundColor: "#f9f9f9",
+            }}
+          >
+            <img
+              src="/BacteRiUM logo.png"
+              alt="BacteRiUM Logo"
+              style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
+            />
+          </Box>
         </Box>
       </Box>
     </Box>
