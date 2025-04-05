@@ -50,8 +50,8 @@ async def get_db():
 
 #Pydantic models
 class UserPy(BaseModel):
-    name: str
     email: str
+    name: str
     role: int
 
 class SensorPy(BaseModel): 
@@ -77,7 +77,7 @@ class User(Base):
 
 class SensorReading(Base):
     __tablename__ = "sensors"
-    timestamp = Column("timestamp", TIMESTAMP(timezone=True), nullable=False)
+    timestamp = Column("timestamp", TIMESTAMP(timezone=True), primary_key=True)
     temperature = Column(Float, nullable=False)
     humidity = Column(Float, nullable=False)
     light_intensity = Column(Float, nullable=False)
