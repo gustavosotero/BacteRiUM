@@ -85,7 +85,7 @@ class SensorReading(Base):
 
 class Notification(Base):
     __tablename__ = "notifications"
-    id = Column(Integer, primary_key=True, index=True)
+    notification_id = Column(Integer, primary_key=True, index=True)
     timestamp = Column(DateTime, nullable=False)
     text = Column(String, nullable=False)
     type = Column(Integer, nullable=False)
