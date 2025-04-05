@@ -4,14 +4,14 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, String, Float, Integer, DateTime, text, select, delete
 from pydantic import BaseModel
 from datetime import datetime
-from datetime import datetime, timedelta
-import os
+from datetime import datetime
 import logging
 import paho.mqtt.client as mqtt
 from mqtt_client import start_mqtt
 from fastapi.middleware.cors import CORSMiddleware
 import threading
 import asyncio
+from sqlalchemy.dialects.postgresql import TIMESTAMP
 
 #Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -50,8 +50,8 @@ async def get_db():
 
 #Pydantic models
 class UserPy(BaseModel):
-    name: str
     email: str
+    name: str
     role: int
 
 class SensorPy(BaseModel): 
@@ -77,7 +77,7 @@ class User(Base):
 
 class SensorReading(Base):
     __tablename__ = "sensors"
-    timestamp = Column(DateTime(timezone=True), primary_key=True)
+    timestamp = Column("timestamp", TIMESTAMP(timezone=True), primary_key=True)
     temperature = Column(Float, nullable=False)
     humidity = Column(Float, nullable=False)
     light_intensity = Column(Float, nullable=False)
@@ -85,8 +85,8 @@ class SensorReading(Base):
 
 class Notification(Base):
     __tablename__ = "notifications"
-    id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, nullable=False)
+    notification_id = Column(Integer, primary_key=True, index=True)
+    timestamp = Column("timestamp", TIMESTAMP(timezone=True), nullable=False)
     text = Column(String, nullable=False)
     type = Column(Integer, nullable=False)
 
@@ -174,7 +174,6 @@ async def get_light_intensity(db: AsyncSession = Depends(get_db)):
 @app.get("/sensors/")
 async def get_sensor_data(start_date: datetime, end_date: datetime, db: AsyncSession = Depends(get_db)):
     logger.info(f"Querying sensor data from {start_date} to {end_date}")
-    start_date = start_date - timedelta(days=1)
     result = await db.execute(
         text("SELECT * FROM sensors WHERE timestamp >= :start AND timestamp <= :end ORDER BY timestamp ASC"),
         {"start": start_date, "end": end_date}
@@ -192,7 +191,6 @@ async def get_sensor_data(start_date: datetime, end_date: datetime, db: AsyncSes
 @app.get("/sensors/temperature")
 async def get_temperature_data(start_date: datetime, end_date: datetime, db: AsyncSession = Depends(get_db)):
     logger.info(f"Querying temperature data from {start_date} to {end_date}")
-    start_date = start_date - timedelta(days=1)
     result = await db.execute(
         text("SELECT timestamp, temperature FROM sensors WHERE timestamp >= :start AND timestamp <= :end ORDER BY timestamp ASC"),
         {"start": start_date, "end": end_date}
@@ -206,7 +204,6 @@ async def get_temperature_data(start_date: datetime, end_date: datetime, db: Asy
 @app.get("/sensors/humidity")
 async def get_humidity_data(start_date: datetime, end_date: datetime, db: AsyncSession = Depends(get_db)):
     logger.info(f"Querying humidity data from {start_date} to {end_date}")
-    start_date = start_date - timedelta(days=1)
     result = await db.execute(
         text("SELECT timestamp, humidity FROM sensors WHERE timestamp >= :start AND timestamp <= :end ORDER BY timestamp ASC"),
         {"start": start_date, "end": end_date}
@@ -220,7 +217,6 @@ async def get_humidity_data(start_date: datetime, end_date: datetime, db: AsyncS
 @app.get("/sensors/light_intensity")
 async def get_light_intensity_data(start_date: datetime, end_date: datetime, db: AsyncSession = Depends(get_db)):
     logger.info(f"Querying light intensity data from {start_date} to {end_date}")
-    start_date = start_date - timedelta(days=1)
     result = await db.execute(
         text("SELECT timestamp, light_intensity FROM sensors WHERE timestamp >= :start AND timestamp <= :end ORDER BY timestamp ASC"),
         {"start": start_date, "end": end_date}
@@ -234,7 +230,6 @@ async def get_light_intensity_data(start_date: datetime, end_date: datetime, db:
 @app.get("/sensors/image_url")
 async def get_image_url_data(start_date: datetime, end_date: datetime, db: AsyncSession = Depends(get_db)):
     logger.info(f"Querying image URL data from {start_date} to {end_date}")
-    start_date = start_date - timedelta(days=1)
     result = await db.execute(
         text("SELECT timestamp, image_url FROM sensors WHERE timestamp >= :start AND timestamp <= :end ORDER BY timestamp ASC"),
         {"start": start_date, "end": end_date}
