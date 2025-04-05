@@ -55,13 +55,13 @@ class UserPy(BaseModel):
     role: int
 
 class SensorPy(BaseModel): 
-    timestamp: TIMESTAMP
+    timestamp: datetime
     temperature: float
     humidity: float
     image_url: str | None = None
 
 class NotificationPy(BaseModel):
-    timestamp: TIMESTAMP
+    timestamp: datetime
     text: str
     type: int
 
